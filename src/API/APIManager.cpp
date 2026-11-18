@@ -84,4 +84,15 @@ void APIs::RequestAPIs()
 			logger::warn("Failed to obtain OAR Functions API");
 		}
 	}
+
+	if (!GTSPlugin) {
+		GTSPlugin = reinterpret_cast<GTSPluginAPI::GTSPluginAPIV1*>(GTSPluginAPI::RequestPluginAPI());
+
+		if (GTSPlugin) {
+			logger::info("Obtained GTSPluginAPI V1");
+		} 
+		else {
+			logger::warn("Failed to obtain GTSPluginAPI");
+		}
+	}
 }

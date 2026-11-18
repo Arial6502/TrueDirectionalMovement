@@ -3,6 +3,7 @@
 #include "Events.h"
 #include "Offsets.h"
 #include "Hooks.h"
+#include "API/APIManager.h"
 
 #include <Psapi.h>
 #include <DbgHelp.h>
@@ -40,6 +41,15 @@ namespace
 		float yaw;
 		float pitch;
 	};
+
+	float GetGTSRotationSlowdown(RE::Actor* a_actor)
+	{
+		float mult = 1.f;
+		if (APIs::GTSPlugin && APIs::GTSPlugin->GetAnimationSlowdown(a_actor, mult) == GTSPluginAPI::APIResult::kOk) {
+			return mult;
+		}
+		return 1.f;
+	}
 
 	TargetLockAdjustSpeeds GetTargetLockAdjustSpeeds(const RE::NiPoint3& a_targetPos, bool a_forceLegacyCorrection)
 	{
@@ -1245,6 +1255,8 @@ void DirectionalMovementHandler::UpdateRotation(bool bForceInstant /*= false */)
 			}
 		}
 		
+		rotationSpeedMult *= GetGTSRotationSlowdown(playerCharacter);
+
 		if (rotationSpeedMult <= 0.f) {
 			return;
 		}
@@ -1320,7 +1332,8 @@ void DirectionalMovementHandler::UpdateRotationLockedCam()
 	float angleDelta = GetAngle(currentPlayerDirection, playerDirectionToTargetXY);
 	angleDelta = NormalRelativeAngle(angleDelta);
 
-	const auto targetLockAdjustSpeeds = GetTargetLockAdjustSpeeds(targetPos, false);
+	auto targetLockAdjustSpeeds = GetTargetLockAdjustSpeeds(targetPos, false);
+	targetLockAdjustSpeeds.yaw *= GetGTSRotationSlowdown(playerCharacter);
 	const float realTimeDeltaTime = GetRealTimeDeltaTime();
 
 	float desiredCharacterYaw = currentCharacterYaw + angleDelta;

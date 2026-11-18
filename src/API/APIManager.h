@@ -5,6 +5,7 @@
 #include "API/TrueHUDAPI.h"
 #include "API/IDRC_API.h"
 #include "API/OpenAnimationReplacerAPI-Functions.h"
+#include "API/GTSPluginAPI.h"
 
 struct APIs
 {
@@ -13,6 +14,7 @@ struct APIs
 	static inline TRUEHUD_API::IVTrueHUD3* TrueHUD = nullptr;
 	static inline IDRC_API::IVIDRC1* IDRC = nullptr;
 	static inline OAR_API::Functions::IFunctionsInterface1* OAR_Functions = nullptr;
+	static inline GTSPluginAPI::GTSPluginAPIV1* GTSPlugin = nullptr;
 
 	static void RequestAPIs();
 };
