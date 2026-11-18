@@ -36,7 +36,7 @@
         },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
-          "value": "x64-windows-static-md-v143"
+          "value": "x64-windows-static-md"
         },
         "VCPKG_OVERLAY_TRIPLETS": {
           "type": "PATH",
@@ -52,7 +52,7 @@
         "value": "x64"
       },
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX"
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX /Wv:18"
       },
       "generator": "Visual Studio 18 2026",
       "inherits": [

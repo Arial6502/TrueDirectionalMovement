@@ -62,7 +62,7 @@ env:
 
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: windows-latest
     outputs:
       ARTIFACT_NAME: ${{ steps.export.outputs.ARTIFACT_NAME }}
       BINARY_NAME: ${{ steps.export.outputs.BINARY_NAME }}
@@ -147,4 +147,3 @@ jobs:
         path: |
           ${{ steps.export.outputs.BINARY_PATH }}
           ${{ steps.export.outputs.PDB_PATH }}
-      
