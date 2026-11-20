@@ -305,7 +305,7 @@ void DirectionalMovementHandler::Update()
 
 		if (Settings::bHeadtracking && !GetForceDisableHeadtracking()) {
 			auto playerCamera = RE::PlayerCamera::GetSingleton();
-			if (playerCharacter && playerCamera && playerCamera->currentState && (playerCamera->currentState->id != RE::CameraState::kThirdPerson || IFPV_IsFirstPerson() || ImprovedCamera_IsFirstPerson())){
+			if (playerCharacter && playerCamera && playerCamera->currentState && (playerCamera->currentState->id != RE::CameraState::kThirdPerson || IFPV_IsFirstPerson() || ImprovedCamera_IsFirstPerson() || ImprovedCamera_IsFakeFirstPerson())){
 				// disable headtracking while not in third person
 				playerCharacter->AsActorState()->actorState2.headTracking = false;
 				if (!IsBehaviorPatchInstalled(playerCharacter) && !RE::UI::GetSingleton()->IsMenuOpen(RE::RaceSexMenu::MENU_NAME)) {
@@ -465,7 +465,7 @@ void DirectionalMovementHandler::UpdateFacingState()
 		currentAttackState = playerAttackState;
 	}
 
-	bool bShouldFaceCrosshairWhileMoving = (playerActorState->GetWeaponState() == RE::WEAPON_STATE::kSheathed ? Settings::uDirectionalMovementSheathed : Settings::uDirectionalMovementDrawn) == DirectionalMovementMode::kVanilla;
+	bool bShouldFaceCrosshairWhileMoving = ImprovedCamera_IsFakeFirstPerson() || (playerActorState->GetWeaponState() == RE::WEAPON_STATE::kSheathed ? Settings::uDirectionalMovementSheathed : Settings::uDirectionalMovementDrawn) == DirectionalMovementMode::kVanilla;
 
 	if (bShouldFaceCrosshairWhileMoving && HasMovementInput() && !HasTargetLocked()) {
 		_bShouldFaceCrosshair = true;
@@ -1392,33 +1392,38 @@ bool DirectionalMovementHandler::ImprovedCamera_IsFirstPerson() const
 			return false;
 		}
 
-		// Normal first person.
-		if (camera->IsInFirstPerson()) {
-			return true;
-		}
-		// TFC.
-		if (camera->IsInFreeCameraMode()) {
-			return false;
-		}
-
-		auto currentState = camera->currentState.get();
-		if (!currentState) {
-			return false;
-		}
-
-		// CameraID correction, not all camera states inherit from ThirdPersonState.
-		auto cameraID = currentState->id;
-		if (cameraID < RE::CameraState::kThirdPerson || cameraID > RE::CameraState::kDragon) {
-			cameraID = RE::CameraState::kThirdPerson;
-		}
-		// Fake first person.
-		auto thirdPersonState = static_cast<RE::ThirdPersonState*>(camera->cameraStates[cameraID].get());
-		if (thirdPersonState && thirdPersonState->targetZoomOffset == -0.275f) {
-			return true;
-		}
+		return camera->IsInFirstPerson();
 	}
 
 	return false;
+}
+
+// Improved Camera's zoomed-in third person view. Not treated as first person, because turning off
+// directional movement there breaks mouselook while moving.
+bool DirectionalMovementHandler::ImprovedCamera_IsFakeFirstPerson() const
+{
+	if (!_bICInstalled) {
+		return false;
+	}
+
+	auto camera = RE::PlayerCamera::GetSingleton();
+	if (!camera || camera->IsInFirstPerson() || camera->IsInFreeCameraMode()) {
+		return false;
+	}
+
+	auto currentState = camera->currentState.get();
+	if (!currentState) {
+		return false;
+	}
+
+	// CameraID correction, not all camera states inherit from ThirdPersonState.
+	auto cameraID = currentState->id;
+	if (cameraID < RE::CameraState::kThirdPerson || cameraID > RE::CameraState::kDragon) {
+		cameraID = RE::CameraState::kThirdPerson;
+	}
+
+	auto thirdPersonState = static_cast<RE::ThirdPersonState*>(camera->cameraStates[cameraID].get());
+	return thirdPersonState && thirdPersonState->currentZoomOffset == -0.275f;
 }
 
 bool DirectionalMovementHandler::IsImprovedCameraInstalled() const

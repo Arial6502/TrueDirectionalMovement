@@ -85,6 +85,7 @@ public:
 	
 	bool IFPV_IsFirstPerson() const;
 	bool ImprovedCamera_IsFirstPerson() const;
+	bool ImprovedCamera_IsFakeFirstPerson() const;
 	bool IsImprovedCameraInstalled() const;
 
 	TDM_API::DirectionalMovementMode GetDirectionalMovementMode() const;

@@ -1407,7 +1407,7 @@ namespace Hooks
 			a_this->SetGraphVariableBool("IsNPC", false);
 		}
 
-		if (directionalMovementHandler->IFPV_IsFirstPerson() || directionalMovementHandler->ImprovedCamera_IsFirstPerson())
+		if (directionalMovementHandler->IFPV_IsFirstPerson() || directionalMovementHandler->ImprovedCamera_IsFirstPerson() || directionalMovementHandler->ImprovedCamera_IsFakeFirstPerson())
 		{
 			actorState->actorState2.headTracking = false;
 			a_this->SetGraphVariableBool("IsNPC", false);
